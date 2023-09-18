@@ -1,0 +1,18 @@
+Restructuration:
+	fltr_prixs est statique
+	les autres insts sont modulables
+
+	supression:
+		glissade. le model doit trouver lui meme ses "glissades"
+
+Instructions:
+	COND2_pas2
+	COND4_pas2
+	COND4_pas1
+	MOY2_pas1
+	MOY2_pas2
+
+Visualisation
+	montrer les evolutions de chaque valeure internement a Mdl_t.
+	l'evolution : comportement(Mdl_t * mdl)
+
