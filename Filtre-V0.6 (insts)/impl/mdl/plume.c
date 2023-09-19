@@ -5,19 +5,19 @@ void plume_mdl(Mdl_t * mdl) {
 	printf("-- Configuration --\n");
 	FOR(0, c, mdl->C)
 		inst_plume_config[mdl->type[c]](mdl, c);
-
-	printf("------ Poids ------\n");
+	
+	/*printf("------ Poids ------\n");
 	FOR(1, c, mdl->C)
 		inst_plume_poids[mdl->type[c]](mdl, c);
 
 	printf("---- Constantes ---\n");
-	fltr_prix_plume_constes(mdl);
+	fltr_prix_plume_constes(mdl);*/
 };
 
 //===============================================
 
 void comportement(Mdl_t * mdl) {
-#define T 15
+#define T 24
 
 	uint depart = DEPART + (rand() % (PRIXS-DEPART-T-1));
 
@@ -31,10 +31,10 @@ void comportement(Mdl_t * mdl) {
 	};
 
 	for (uint i=0; i < mdl->vars; i++) {
-		printf("%i| ", i);
+		printf("%2.i| ", i);
 		for (uint t=0; t < T; t++) {
 			if (var_par_t[t*mdl->vars + i] >= 0) printf(" ");
-			printf("%f | ", var_par_t[t*mdl->vars + i]);
+			printf("%-3.2f | ", var_par_t[t*mdl->vars + i]);
 		}
 		printf("\n");
 	}

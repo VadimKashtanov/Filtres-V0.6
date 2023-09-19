@@ -22,10 +22,14 @@ typedef struct  {
 } Env_t;
 
 //  Fonctions de score
-float gain(Mdl_t * mdl, uint l);
-float prediction(Mdl_t * mdl, uint l);
+float gain(Mdl_t * mdl, uint l);			//	le gain exacte sur tout le `prix`
+float prediction(Mdl_t * mdl, uint l);		//	% de prediction de tendance
+float investissement(Mdl_t * mdl, uint l);	//	% de bon placement (donc ignorance de f(x)=0)
+float gain_168H(Mdl_t * mdl, uint l);		//	gain dernier semaine avex x25
 
-void gain_pred(Mdl_t * mdl, uint l, float * _gain, float * _pred);
+float gain_JUSQUE_PRIXS(Mdl_t * mdl, uint l, float __LEVIER);
+
+void gain_pred_invest(Mdl_t * mdl, uint l, float * _gain, float * _pred, float * _invest, float * _gain_170H);
 
 //  Fonctions de Mutation
 void muter_filtres(Mdl_t * G, Mdl_t * P, float proba, float COEF_G);
@@ -45,40 +49,47 @@ void muter_intervalle(Mdl_t * G, Mdl_t * P, float proba, float COEF_G);
 //	score[i] -> prediction(mdl[i])
 //	cintu[i] -> #rang du i-eme mdl
 
-#define MODE_DE_SCORE 3 /*
+#define MODE_DE_SCORE 5 /*
 Valeur du rang dans les points
 	0 : 1*pred + 1*gain
 	1 : 1*pred
 	2 : 	     1*gain
 	3 : 2*pred + 1*gain
 	4 : 1*pred + 2*gain
+	5 : 1*pred + 1*gain + 1*invest + 1*gain_168H
 */
 
-#define S_FILTRES 			5
+#define S_FILTRES 			4
 typedef struct {
-	float  gain[S_FILTRES];
-	float  pred[S_FILTRES];
-	uint    pts[S_FILTRES];
-	uint  cintu[S_FILTRES];
-	Mdl_t * mdl[S_FILTRES];
+	float      gain[S_FILTRES];
+	float      pred[S_FILTRES];
+	float    invest[S_FILTRES];
+	float gain_168H[S_FILTRES];
+	uint        pts[S_FILTRES];
+	uint      cintu[S_FILTRES];
+	Mdl_t *     mdl[S_FILTRES];
 } F_t;
 
-#define S_POIDS 			4
+#define S_POIDS 			3
 typedef struct {
-	float  gain[S_POIDS];
-	float  pred[S_POIDS];
-	uint    pts[S_POIDS];
-	uint  cintu[S_POIDS];
-	F_t *    ft[S_POIDS];
+	float      gain[S_POIDS];
+	float      pred[S_POIDS];
+	float    invest[S_POIDS];
+	float gain_168H[S_POIDS];
+	uint        pts[S_POIDS];
+	uint      cintu[S_POIDS];
+	F_t *        ft[S_POIDS];
 } P_t;
 
 #define S_EMA_INT_GLISSE  	3
 typedef struct poids_filtres {
-	float  pred[S_EMA_INT_GLISSE];
-	float  gain[S_EMA_INT_GLISSE];
-	uint    pts[S_EMA_INT_GLISSE];
-	uint  cintu[S_EMA_INT_GLISSE];
-	P_t *    pt[S_EMA_INT_GLISSE];
+	float      pred[S_EMA_INT_GLISSE];
+	float      gain[S_EMA_INT_GLISSE];
+	float    invest[S_EMA_INT_GLISSE];
+	float gain_168H[S_EMA_INT_GLISSE];
+	uint        pts[S_EMA_INT_GLISSE];
+	uint      cintu[S_EMA_INT_GLISSE];
+	P_t *        pt[S_EMA_INT_GLISSE];
 } EIG_t;
 
 Mdl_t * ft_meilleur(F_t * ft);
@@ -110,26 +121,17 @@ Mdl_t * individuel_fp(Mdl_t * depart, Env_t env, uint T_ft);
 Mdl_t * individuel_pt(Mdl_t * depart, Env_t env, uint T_ft, uint T_pt);
 Mdl_t * individuel_eig(Mdl_t * depart, Env_t env, uint T_ft, uint T_pt, uint T_eig);
 
-//	Tout est base sur 1 seul gagant
-//	#define combien de perdants pour 1 gagant
-//
+//	Pareil que EIG mais en 1 seule structure
+#define N_GRANDE S_EMA_INT_GLISSE*S_POIDS*S_FILTRES
+#define SE S_EMA_INT_GLISSE
+#define SP S_POIDS
+#define SF S_FILTRES
 typedef struct grande_selection {
-	/*	
-
-	*/
-	EIG_t eig;
-	
-	/*	Chaque bloque de selection a un .MUTP et .COEF_G
-Ces parametres vont decroitre de `de` a `a` durant le
-bloque locale.
-		Si de.MUTP_cst=0.5, a.MUTP_cst=0.1 et que T=100
-	alors coef_g a t=30 sera
-	== a.MUTP_cst+f(t,T)*(de.MUTP_cst=0.5-a.MUTP_cst)
-	*/
-	Env_t de, a;
-	uint fonction[];	/*
-	0|	f(t,T) = (T-t-1)/T
-	1|	f(t,T) = exp(-t/a)      a=-T/ln(0.01)
-	2|	f(t,T) = tanh(-t/a)+1   a=-T/atanh(0.01-1)
-	*/
+	float      pred[N_GRANDE];
+	float      gain[N_GRANDE];
+	float    invest[N_GRANDE];
+	float gain_168H[N_GRANDE];
+	uint        pts[N_GRANDE];
+	uint      cintu[N_GRANDE];
+	Mdl_t *     mdl[N_GRANDE];
 } Grande_t;

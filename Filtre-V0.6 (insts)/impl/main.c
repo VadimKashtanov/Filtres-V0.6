@@ -11,20 +11,47 @@ Env_t env = {
 	.MUTP_cst           =0.30,  .COEF_G_cst           =0.80,
 	.MUTP_p             =0.30,	.COEF_G_p             =0.80,
 	//
-	.MUTP_ema           =0.30,  .COEF_G_ema           =0.90,
-	.MUTP_int           =0.30,  .COEF_G_int           =0.90,
+	.MUTP_ema           =0.20,  .COEF_G_ema           =0.80,
+	.MUTP_int           =0.20,  .COEF_G_int           =0.80,
 
 	//  Longeure
 	.l=3
 };
 
 void score(Mdl_t * mdl) {
-	printf("%f %f\n", prediction(mdl, env.l), gain(mdl, env.l));
+	printf("score : %f %f %f %f\n", prediction(mdl, env.l), gain(mdl, env.l), investissement(mdl, env.l), gain_168H(mdl, env.l));
 };
 
 int main_petits_tests() {
 	srand(0);
 	charger_les_prixs();
+
+	Mdl_t * mdl = lire_mdl("mdl.bin");
+	plume_mdl(mdl);
+
+	score(mdl);
+
+	float _prediction = 0.0;
+	//
+	float _f, p0, p1;
+	uint t=0;
+	for (uint i=DEPART; i < PRIXS-1-env.l; i++) {
+		p1 = prixs[i+env.l];
+		p0 = prixs[i];
+		//
+		_f = f(mdl, i);
+		
+		if (signe(p1/p0-1.0) == signe(_f))
+			_prediction += 1.0;
+
+		//
+#define div_par 0*(1+rand()%10)
+		i += div_par;
+		i += env.l;
+		if (_f != 0) t++;
+	};
+
+	printf("%f\n", _prediction / (float)t);
 };
 
 int main_mdl() {
@@ -96,11 +123,11 @@ int main_eig() {
 	INIT_BARRE(avancement);
 	DEPART_BARRE(avancement);
 
-#define T_EIG 1
+#define T_EIG 20
 	FOR(0, i, T_EIG) {
-#define T_POIDS 2
+#define T_POIDS 5//30
 		FOR(0, p, T_POIDS) {
-#define T_FLTR 3
+#define T_FLTR 10
 			FOR(0, cst, T_FLTR) {
 				if (cst != T_FLTR-1) eig_muter_tous_ft(eig, env);
 				score_eig(eig, env);
@@ -112,6 +139,7 @@ int main_eig() {
 		if (i != T_EIG-1) muter_eig(eig, env);
 		{
 			Mdl_t * meilleur = eig_meilleur(eig);
+			ptr("#%i Meilleur : ", i);score(meilleur);
 			plume_mdl(meilleur);
 		}
 	}
@@ -123,14 +151,19 @@ int main_eig() {
 	score(meilleur);
 	comportement(meilleur);
 	plume_mdl(meilleur);
-	gain(meilleur, env.l);
+	//gain(meilleur, env.l);
+
+	printf(">>> Gains dernieres %iH : %f  levier=%f\n", (PRIXS-JUSQUE), gain_JUSQUE_PRIXS(meilleur, env.l, 10.0), 10.0);
+	printf(">>> Gains dernieres %iH : %f  levier=%f\n", (PRIXS-JUSQUE), gain_JUSQUE_PRIXS(meilleur, env.l, 25.0), 25.0);
+	printf(">>> Gains dernieres %iH : %f  levier=%f\n", (PRIXS-JUSQUE), gain_JUSQUE_PRIXS(meilleur, env.l, 50.0), 50.0);
 
 	ecrire_mdl(meilleur, "mdl.bin");
 };
 
 int main() {
+	//main_petits_tests();
 	//main_mdl();
 	//main_pt();
 	//main_ft();
-	//main_eig();
+	main_eig();
 }

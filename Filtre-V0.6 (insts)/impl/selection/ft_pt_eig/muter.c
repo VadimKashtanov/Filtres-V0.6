@@ -19,7 +19,8 @@ void muter_pt(P_t * pt, Env_t env) {
 		FOR(0, j, S_FILTRES) {
 			if (!(i == 0 && j == 0)) {
 				F_t * ft = pt->ft[pt->cintu[i]];
-				memcpy(ft->mdl[ft->cintu[j]], Gmdl, sizeof(Mdl_t));
+				//memcpy(ft->mdl[ft->cintu[j]], Gmdl, sizeof(Mdl_t));
+				memcpy(ft->mdl[ft->cintu[j]]->conste, Gmdl->conste, sizeof(float) * Gmdl->constes);
 				if (i != 0)
 					muter_poids(Gmdl, ft->mdl[ft->cintu[j]], env.MUTP_p, env.COEF_G_p);
 			}

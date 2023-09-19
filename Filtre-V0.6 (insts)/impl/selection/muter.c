@@ -51,8 +51,11 @@ void muter_poids(Mdl_t * G, Mdl_t * P, float proba, float COEF_G) {
 void muter_ema(Mdl_t * G, Mdl_t * P, float proba, float COEF_G) {
 	FOR(0, i, G->y[0]) {
 		P->ema[i] = G->ema[i];
-		if (rnd() <= proba)
+		if (rnd() <= proba) {
+		//	ptr("%i ", P->ema[i]);
 			P->ema[i] = (uint)roundf(COEF_G*G->ema[i] + (1-COEF_G)*(rand()%NB_DIFF_EMA));
+		//	ptr("%i\n", P->ema[i]);
+		}
 	}
 };
 
