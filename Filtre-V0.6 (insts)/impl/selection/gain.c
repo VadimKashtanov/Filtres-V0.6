@@ -41,7 +41,7 @@ float prediction(Mdl_t * mdl, uint l) {
 
 		//
 #define div_par 0*(1+rand()%10)
-		i += div_par;
+		//i += div_par;
 		i += l;
 		t++;
 	};
@@ -66,8 +66,8 @@ float investissement(Mdl_t * mdl, uint l) {
 			_prediction += 1.0;
 
 		//
-#define div_par 0*(1+rand()%10)
-		i += div_par;
+//#define div_par 0*(1+rand()%10)
+//		i += div_par;
 		i += l;
 		if (_f != 0) t++;		//<<---
 	};
@@ -98,7 +98,7 @@ void gain_pred_invest(
 		//
 		_f = f(mdl, i);
 		//
-		if (_gain > 0) {
+		if (*_gain > 0) {
 			*_gain += (*_gain) * _f * LEVIER * (p1/p0 - 1.0);
 		} else {
 			*_gain = 0;
@@ -113,6 +113,8 @@ void gain_pred_invest(
 
 		t++;
 		if (_f != 0) _t++;
+
+		i += 5;//*(1+rand()%10);
 	};
 
 	*_gain -= USDT;
@@ -120,17 +122,18 @@ void gain_pred_invest(
 	*_invest /= (float)_t;
 
 	*_gain_168H = USDT;
-	FOR(JUSQUE, i, PRIXS-JUSQUE-1-l) {
+	FOR(JUSQUE, i, PRIXS-1-l) {
 		p1 = prixs[i+l];
 		p0 = prixs[i];
 		//
 		_f = f(mdl, i);
 		//
-		if (_gain_168H > 0) {
+		if (*_gain_168H > 0) {
 			*_gain_168H += (*_gain_168H) * _f * 25 * (p1/p0 - 1.0);
 		} else {
 			*_gain_168H = 0;
 		}
+		if (*_gain_168H<0) {*_gain_168H=0;break;};
 		//
 		i += l;
 	};

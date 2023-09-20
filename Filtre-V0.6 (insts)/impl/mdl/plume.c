@@ -6,12 +6,12 @@ void plume_mdl(Mdl_t * mdl) {
 	FOR(0, c, mdl->C)
 		inst_plume_config[mdl->type[c]](mdl, c);
 	
-	/*printf("------ Poids ------\n");
-	FOR(1, c, mdl->C)
-		inst_plume_poids[mdl->type[c]](mdl, c);
+	//printf("------ Poids ------\n");
+	//FOR(1, c, mdl->C)
+	//	inst_plume_poids[mdl->type[c]](mdl, c);
 
-	printf("---- Constantes ---\n");
-	fltr_prix_plume_constes(mdl);*/
+	//printf("---- Constantes ---\n");
+	//fltr_prix_plume_constes(mdl);
 };
 
 //===============================================

@@ -1,57 +1,71 @@
-#include "selection.h"
+#include "sel2.h"
 
-uint C      = 4;
-uint type[] = {FLTR_PRIX, COND4, COND4, COND4};
+uint C      = 5;
+uint type[] = {FLTR_PRIX, COND4, COND4, COND4, COND4};
 //
-uint y[]    = {        8,     4,     2,     1};
-uint n[]    = {        8,     2,     2,     2};
+uint y[]    = {       16,     8,     4,     2,     1};
+uint n[]    = {        7,     2,     2,     2,     2};
 
 Env_t env = {
 	//  Le gagant ne muteras jamais
-	.MUTP_cst           =0.30,  .COEF_G_cst           =0.80,
-	.MUTP_p             =0.30,	.COEF_G_p             =0.80,
+	.MUTP_cst           =0.30,  .COEF_G_cst           =0.60,
+	.MUTP_p             =0.02,	.COEF_G_p             =0.80,
 	//
-	.MUTP_ema           =0.20,  .COEF_G_ema           =0.80,
-	.MUTP_int           =0.20,  .COEF_G_int           =0.80,
+	.MUTP_ema_int       =0.30,  .COEF_G_ema_int       =0.70,
 
 	//  Longeure
 	.l=3
 };
 
 void score(Mdl_t * mdl) {
-	printf("score : %f %f %f %f\n", prediction(mdl, env.l), gain(mdl, env.l), investissement(mdl, env.l), gain_168H(mdl, env.l));
+	printf("score : %f %f %f %f\n", gain(mdl, env.l), prediction(mdl, env.l), investissement(mdl, env.l), gain_168H(mdl, env.l));
 };
+
+__attribute__ ((optimize(0)))
+int main_qlq_tests() {
+	srand(2);
+	charger_les_prixs();
+
+	Mdl_t * mdl = cree_mdl(C, y, n, type);
+	plume_mdl(mdl);
+
+	muter_ema_intervalle(mdl, mdl, env);
+	//muter_ema(mdl, mdl, env.MUTP_ema, env.COEF_G_ema);
+
+	muter_ema_intervalle(mdl, mdl, env);
+	//muter_ema(mdl, mdl, env.MUTP_ema, env.COEF_G_ema);
+
+	plume_mdl(mdl);
+};
+
 
 int main_petits_tests() {
 	srand(0);
 	charger_les_prixs();
 
-	Mdl_t * mdl = lire_mdl("mdl.bin");
+	Mdl_t * mdl = cree_mdl(C, y, n, type);;
+	//plume_mdl(mdl);
+
+	uint ft_T = 15;
+	uint pt_T = 20;
+	uint ei_T = 15;
+	//mdl = sel2_filtres(mdl, env, 2, 5,   T);
+	mdl = sel2_ei(
+		mdl, env,
+		//
+		//2, 3,
+		1, 1,
+		ft_T, 0,
+		//
+		//1, 5,
+		1, 3,
+		pt_T, 0,
+		//
+		//1, 2,
+		1, 1,
+		ei_T, 0);
 	plume_mdl(mdl);
-
 	score(mdl);
-
-	float _prediction = 0.0;
-	//
-	float _f, p0, p1;
-	uint t=0;
-	for (uint i=DEPART; i < PRIXS-1-env.l; i++) {
-		p1 = prixs[i+env.l];
-		p0 = prixs[i];
-		//
-		_f = f(mdl, i);
-		
-		if (signe(p1/p0-1.0) == signe(_f))
-			_prediction += 1.0;
-
-		//
-#define div_par 0*(1+rand()%10)
-		i += div_par;
-		i += env.l;
-		if (_f != 0) t++;
-	};
-
-	printf("%f\n", _prediction / (float)t);
 };
 
 int main_mdl() {
@@ -161,9 +175,10 @@ int main_eig() {
 };
 
 int main() {
-	//main_petits_tests();
+	//main_qlq_tests();
+	main_petits_tests();
 	//main_mdl();
 	//main_pt();
 	//main_ft();
-	main_eig();
+	//main_eig();
 }

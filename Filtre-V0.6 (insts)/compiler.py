@@ -14,6 +14,8 @@ chemins = [
     'impl/selection/',
     'impl/selection/ft_pt_eig/',
     'impl/insts/',
+    'impl/selection/grande/',
+    'impl/selection/sel2/'
 ]
 fichiers = [
 	chemin+fichier

@@ -29,7 +29,7 @@ void muter_pt(P_t * pt, Env_t env) {
 };
 
 void muter_eig(EIG_t * eig, Env_t env) {
-	P_t * Gpt = eig->pt[eig->cintu[0]];
+/*	P_t * Gpt = eig->pt[eig->cintu[0]];
 	F_t * Gft = Gpt->ft[Gpt->cintu[0]];
 	Mdl_t * Gmdl = Gft->mdl[Gft->cintu[0]];
 	//
@@ -51,7 +51,7 @@ void muter_eig(EIG_t * eig, Env_t env) {
 				}
 			}
 		}
-	}
+	}*/
 };
 
 void eig_muter_tous_ft(EIG_t * eig, Env_t env) {

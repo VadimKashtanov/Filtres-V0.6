@@ -43,26 +43,66 @@ void muter_poids(Mdl_t * G, Mdl_t * P, float proba, float COEF_G) {
 	FOR(0, i, G->poids) {
 		P->poid[i] = G->poid[i];
 		//
-		if (rnd() <= proba)
-			P->poid[i] = poid_cond_le_plus_proche(COEF_G*G->poid[i] + (1-COEF_G)*poid_cond_rnd());
+		//if (rnd() <= proba)
+		//	P->poid[i] = poid_cond_le_plus_proche(COEF_G*G->poid[i] + (1-COEF_G)*poid_cond_rnd());
+	}
+	uint pos;
+	FOR(0, i, (uint)roundf((float)G->poids * proba)) {
+		pos = rand() % G->poids;
+		P->poid[pos] = poid_cond_le_plus_proche(
+			COEF_G*G->poid[pos] + (1-COEF_G)*poid_cond_rnd());
 	}
 };
 
 void muter_ema(Mdl_t * G, Mdl_t * P, float proba, float COEF_G) {
-	FOR(0, i, G->y[0]) {
+/*	FOR(0, i, G->y[0]) {
 		P->ema[i] = G->ema[i];
-		if (rnd() <= proba) {
+		//if (rnd() <= proba) {
 		//	ptr("%i ", P->ema[i]);
-			P->ema[i] = (uint)roundf(COEF_G*G->ema[i] + (1-COEF_G)*(rand()%NB_DIFF_EMA));
+		//	P->ema[i] = (uint)roundf(COEF_G*G->ema[i] + (1-COEF_G)*(rand()%NB_DIFF_EMA));
 		//	ptr("%i\n", P->ema[i]);
-		}
+		//}
 	}
+	uint pos;
+	FOR(0, i, (uint)roundf((float)G->y[0] * proba)) {
+		pos = rand() % G->y[0];
+		P->ema[pos] = (uint)roundf(
+			COEF_G*G->ema[pos] + (1-COEF_G)*(rand()%NB_DIFF_EMA));
+	}
+*/
 };
 
 void muter_intervalle(Mdl_t * G, Mdl_t * P, float proba, float COEF_G) {
+	/*FOR(0, i, G->y[0]) {
+		P->intervalles[i] = G->intervalles[i];
+	//	if (rnd() <= proba)
+	//		P->intervalles[i] = (uint)roundf(COEF_G*G->intervalles[i] + (1-COEF_G)*(rand()%INTERVALLES));
+	}
+	uint pos;
+	FOR(0, i, (uint)roundf((float)G->y[0] * proba)) {
+		pos = rand() % G->y[0];
+		P->intervalles[pos] = (uint)roundf(
+			COEF_G*G->intervalles[pos] + (1-COEF_G)*(rand()%INTERVALLES));
+	}*/
+};
+
+
+void muter_ema_intervalle(Mdl_t * G, Mdl_t * P, Env_t env) {
 	FOR(0, i, G->y[0]) {
 		P->intervalles[i] = G->intervalles[i];
-		if (rnd() <= proba)
-			P->intervalles[i] = (uint)roundf(COEF_G*G->intervalles[i] + (1-COEF_G)*(rand()%INTERVALLES));
+		P->ema[i] = G->ema[i];
+	//	if (rnd() <= proba)
+	//		P->intervalles[i] = (uint)roundf(COEF_G*G->intervalles[i] + (1-COEF_G)*(rand()%INTERVALLES));
+	}
+	float proba = env.MUTP_ema_int;
+	float COEF_G = env.COEF_G_ema_int;
+	uint pos;
+	FOR(0, i, (uint)roundf(0.5+(float)G->y[0]*proba)) {
+		pos = rand() % G->y[0];
+		//
+		P->intervalles[pos] = (uint)roundf(
+			COEF_G*G->intervalles[pos] + (1-COEF_G)*(rand()%INTERVALLES));
+		P->ema[pos] = (uint)roundf(
+			COEF_G*G->ema[pos] + (1-COEF_G)*(rand()%NB_DIFF_EMA));
 	}
 };

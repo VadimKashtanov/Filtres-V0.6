@@ -8,14 +8,14 @@ typedef struct  {
 	//  %[0;1] de chance que P mute
 	float MUTP_cst;		//% filtres
 	float MUTP_p;		//% poids
-	float MUTP_ema;		//% ema
-	float MUTP_int;		//% intervalles
+	float MUTP_ema_int;		//% ema
+	//float MUTP_int;		//% intervalles
 
 	//	%[0;1] d'influence de la valeure du G, quand P mute
 	float COEF_G_cst;
 	float COEF_G_p;
-	float COEF_G_ema;
-	float COEF_G_int;
+	float COEF_G_ema_int;
+	//float COEF_G_int;
 	
 	//  u += u*f*levier*( prix[i+l]/prix[i]-1 )
 	uint l; //=2;
@@ -36,6 +36,8 @@ void muter_filtres(Mdl_t * G, Mdl_t * P, float proba, float COEF_G);
 void muter_poids(Mdl_t * G, Mdl_t * P, float proba, float COEF_G);
 void muter_ema(Mdl_t * G, Mdl_t * P, float proba, float COEF_G);
 void muter_intervalle(Mdl_t * G, Mdl_t * P, float proba, float COEF_G);
+
+void muter_ema_intervalle(Mdl_t * G, Mdl_t * P, Env_t env);
 
 //couches
 //  n
@@ -132,6 +134,10 @@ typedef struct grande_selection {
 	float    invest[N_GRANDE];
 	float gain_168H[N_GRANDE];
 	uint        pts[N_GRANDE];
+	uint     pts_ft[  SE*SP ];
+	uint     pts_pt[   SE   ];
 	uint      cintu[N_GRANDE];
 	Mdl_t *     mdl[N_GRANDE];
 } Grande_t;
+
+Mdl_t * grande(Mdl_t * depart, Env_t env, uint T_ft, uint T_pt, uint T_eig);
